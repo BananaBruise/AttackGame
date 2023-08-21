@@ -5,9 +5,6 @@
 
 using namespace std;
 
-// forward declaration
-
-
 TEST(EntityTest, AssertDefaultConstructor)
 {
     Entity a;
