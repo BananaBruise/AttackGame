@@ -22,7 +22,11 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 # game executable
-# add_executable(AttackGame entity_test.cpp)
+add_executable(
+  AttackGame
+  # source
+  AttackGame.cpp
+)
 
 # gtest executable
 add_executable(

@@ -10,24 +10,23 @@
     player class
 
     In addition to Entity, Player has:
-    - level
+    - own health scalling
     - inventory of potions (recuperate hp and mp)
     - abilities that consume mp
 */
 
 // globals
-constexpr unsigned MIN_LEVEL = 1; // user level starts at one
-constexpr unsigned INIT_HEALTH = MIN_LEVEL * 100; // initial health
-constexpr unsigned INIT_MAGIC = MIN_LEVEL * 100; // initial magic
+constexpr unsigned INIT_PLAYER_HEALTH = 100; // initial health
+constexpr unsigned INIT_PLAYER_MAGIC = 100; // initial magic
+constexpr double PLAYER_HIT_CHANCE = 0.8; // 80% chance to hit
 
 class Player : public Entity
 {
 public:
     // default constructor
-    Player() : Entity("player", INIT_HEALTH, INIT_MAGIC, "player") {}
+    Player() : Entity("player", INIT_PLAYER_HEALTH, INIT_PLAYER_MAGIC, "player") {}
 
     // getters
-    int get_level() const { return level; }
     unsigned int get_hp_pot_cnt() const { return potions.find("Health Potion")->second;} // [] operator is a non-const member function; use find instead
                                                                                         // https://stackoverflow.com/a/10699752
     unsigned int get_mp_pot_cnt() const { return potions.find("Magic Potion")->second;}
@@ -36,8 +35,7 @@ public:
     Player &add_hp_pot(){potions["Health Potion"]++; return *this;}
     // add mp pot
     Player &add_mp_pot(){potions["Magic Potion"]++; return *this;}
-    // level up
-    Player &level_up(){level++; return *this;};
+
     // restore health
     Player &restore_health(double hp)
     {
@@ -89,15 +87,15 @@ public:
     // read-only print
     inline std::ostream &print(std::ostream &is) const override;
 
+    // overload entity::attack with default player hit chance
+    template<typename Attackee, typename std::enable_if<std::is_base_of<Entity, Attackee>::value>::type* = nullptr>
+    void attack(Attackee &enemy) { Entity::attack(enemy, PLAYER_HIT_CHANCE);}
+
 private:
     // members
     std::map<std::string, unsigned int> potions = {// potion name, potion count
                                                    {"Health Potion", 0},
                                                    {"Magic Potion", 0}};
-    std::map<std::string, unsigned int> abilties; // ability name, mp cost
-                                                  // TODO: figure out how to use abilities
-    unsigned level = MIN_LEVEL; // new player start at level 1
-
     // print list of potions
     std::ostream &print_potions(std::ostream &os) const {
         for(const auto &kv: potions) // https://stackoverflow.com/a/6963910
@@ -107,14 +105,14 @@ private:
     }
 
     // max health
-    double max_health() { return level * 100.0;}
+    double max_health() override { return get_level() * 100.0;}
     // max magic
-    double max_magic() { return level * 100.0;}
+    double max_magic() override { return get_level() * 100.0;}
 };
 
 // out-of-class definition
-std::ostream &Player::print(std::ostream &os) const{
-    Entity::print(os) << "\nlevel: " << this->level << "\n";
+std::ostream &Player::print(std::ostream &os) const {
+    Entity::print(os) << "\n";
     print_potions(os);
 
     return os;
