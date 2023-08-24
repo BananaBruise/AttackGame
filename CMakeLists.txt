@@ -22,18 +22,25 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 # game executable
-# add_executable(AttackGame entity_test.cpp)
+add_executable(
+  AttackGame
+  # source
+  AttackGame.cpp
+)
 
 # gtest executable
 add_executable(
-  entity_test
+  tester
+  # add all testing source file under this line
   entity_test.cpp
+  player_test.cpp
+  monster_test.cpp
 )
 target_link_libraries( # link tester to gtest library
-  entity_test
+  tester
   GTest::gtest_main
 )
 
 # enable CMake tet runner to discover gtests
 include(GoogleTest)
-gtest_discover_tests(entity_test)
+gtest_discover_tests(tester)
