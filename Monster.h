@@ -14,13 +14,14 @@
 */
 
 // globals
-constexpr unsigned INIT_MONSTER_HEALTH = 80; // initial health
-constexpr unsigned INIT_MONSTER_MAGIC = 80; // initlal magic
+constexpr double INIT_MONSTER_HEALTH = 80.0; // initial health
+constexpr double INIT_MONSTER_MAGIC = 80.0; // initlal magic
 constexpr double MONSTER_HIT_CHANCE = 0.5; // 50% chance to hit
+constexpr char MONSTER_TYPE [] = "monster";
 
 class Monster: public Entity {
     public:
-    Monster() : Entity("monster", INIT_MONSTER_HEALTH, INIT_MONSTER_MAGIC, "monster") {}
+    Monster() : Entity(MONSTER_TYPE, INIT_MONSTER_HEALTH, INIT_MONSTER_MAGIC, "monster") {}
 
     // overload entity::attack with default monster hit chance
     template<typename Attackee, typename std::enable_if<std::is_base_of<Entity, Attackee>::value>::type* = nullptr>
@@ -28,11 +29,9 @@ class Monster: public Entity {
 
     private:
     // max health
-    double max_health() override { return get_level() == 1? INIT_MONSTER_HEALTH : std::pow(get_level(), 1.2) * 100.0;}
+    double max_health() override { return std::pow(get_level(), 1.12) * INIT_MONSTER_HEALTH;}
     // max magic
-    double max_magic() override { return get_level() == 1? INIT_MONSTER_MAGIC : std::pow(get_level(), 1.2) * 100.0;}
+    double max_magic() override { return std::pow(get_level(), 1.12) * INIT_MONSTER_MAGIC;}
 };
 
 #endif
-
-//TODO: test level up, constructor, getters, max_health, max_magic

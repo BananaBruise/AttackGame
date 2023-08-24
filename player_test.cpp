@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include "Player.h"
 #include "Monster.h"
 #include "tester_stdout_helper.h"
@@ -13,15 +15,25 @@ TEST(PlayerTest, AssertDefaultConstructor)
 {
     Player p;
     // using getter
-    EXPECT_EQ(p.get_hp(), 100.0) << "hp mismatch";
-    EXPECT_EQ(p.get_mp(), 100.0) << "mp mismatch";
+    EXPECT_EQ(p.get_hp(), INIT_PLAYER_HEALTH) << "hp mismatch";
+    EXPECT_EQ(p.get_mp(), INIT_PLAYER_MAGIC) << "mp mismatch";
     EXPECT_EQ(p.get_desp(), "player") << "description mismatch";
     EXPECT_EQ(p.get_level(), 1) << "level mismatch";
     EXPECT_EQ(p.get_hp_pot_cnt(), 0) << "hp pot mismatch";
     EXPECT_EQ(p.get_mp_pot_cnt(), 0) << "mp pot mismatch";
 
     // using print
-    expect_stdout<Player>(cout, "type: player, level: 1, hp: 100.0, mp: 100.0, description: player\nHealth Potion: 0\nMagic Potion: 0\n", p);
+    ostringstream result;
+    result << fixed << setprecision(1); // see entity::print()
+    result << "type: " << PLAYER_TYPE
+           << ", level: " << p.get_level()
+           << ", hp: " << INIT_PLAYER_HEALTH
+           << ", mp: " << INIT_PLAYER_MAGIC
+           << ", description: " << p.get_desp()
+           << "\nHealth Potion: " << p.get_hp_pot_cnt()
+           << "\nMagic Potion: " << p.get_mp_pot_cnt()
+           << "\n";
+    expect_stdout<Player>(cout, result.str(), p);
 }
 
 // setters: add potions
@@ -41,7 +53,17 @@ TEST(PlayerTest, AssertPotionSetters)
     p.add_mp_pot(); // 3
 
     // test with print
-    expect_stdout<Player>(cout, "type: player, level: 1, hp: 100.0, mp: 100.0, description: player\nHealth Potion: 2\nMagic Potion: 3\n", p);
+    ostringstream result;
+    result << fixed << setprecision(1); // see entity::print()
+    result << "type: " << PLAYER_TYPE
+           << ", level: " << p.get_level()
+           << ", hp: " << INIT_PLAYER_HEALTH
+           << ", mp: " << INIT_PLAYER_MAGIC
+           << ", description: " << p.get_desp()
+           << "\nHealth Potion: " << p.get_hp_pot_cnt()
+           << "\nMagic Potion: " << p.get_mp_pot_cnt()
+           << "\n";
+    expect_stdout<Player>(cout, result.str(), p);
 }
 
 // setters: restore health with potion
@@ -77,11 +99,9 @@ TEST(PlayerTest, AssertHealthPotSetters)
     // no restore when no health potion
     p.update_hp(INIT_PLAYER_HEALTH / 2);
     // check "no potion" message
-    testing::internal::CaptureStdout();
-    p.restore_health();
-    std::cout.flush();
-    std::string print_output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(print_output, "no health potion!\n") << "\"no potion\" message mismatch";
+    string expected = "no health potion!\n";
+    expect_stdout<Player>(cout, expected, p, [](Player play, ostream &os)
+                          { play.restore_health(); });
     // check hp and potion count after "no restore"
     EXPECT_EQ(p.get_hp(), INIT_PLAYER_HEALTH / 2) << "health mismatch";
     EXPECT_EQ(p.get_hp_pot_cnt(), 0) << "health pot mismatch";
@@ -120,11 +140,9 @@ TEST(PlayerTest, AssertMagicPotSetters)
     // no restore when no magic potion
     p.update_mp(INIT_PLAYER_MAGIC / 2);
     // check "no potion" message
-    testing::internal::CaptureStdout();
-    p.restore_magic();
-    std::cout.flush();
-    std::string print_output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(print_output, "no magic potion!\n") << "\"no potion\" message mismatch";
+    string expected = "no magic potion!\n";
+    expect_stdout<Player>(cout, expected, p, [](Player play, ostream &os)
+                          { play.restore_magic(); });
     // check mp and potion count after "no restore"
     EXPECT_EQ(p.get_mp(), INIT_PLAYER_MAGIC / 2) << "magic mismatch";
     EXPECT_EQ(p.get_mp_pot_cnt(), 0) << "magic pot mismatch";
@@ -135,8 +153,8 @@ TEST(PlayerTest, AssertLevelUp)
     Player p;
     p.level_up();
     EXPECT_EQ(p.get_level(), 2) << "level mismatch";
-    EXPECT_EQ(p.get_hp(), 200.0) << "health mismatch";
-    EXPECT_EQ(p.get_mp(), 200.0) << "magic mismatch";
+    EXPECT_EQ(p.get_hp(), p.get_level() * INIT_PLAYER_HEALTH) << "health mismatch";
+    EXPECT_EQ(p.get_mp(), p.get_level() * INIT_PLAYER_MAGIC) << "magic mismatch";
 }
 
 TEST(PlayerTest, AssertAttackOnMonster)
@@ -146,36 +164,30 @@ TEST(PlayerTest, AssertAttackOnMonster)
 
     // capture bad attack input (console)
     {
-        CaptureStdout();
-        p.Entity::attack<Monster>(m, 2.0); // bad call
-        cout.flush();
-        string print_output = GetCapturedStdout();
-        EXPECT_EQ(print_output, "hit change must be between [0.0,1.0)\n") << "stdout mismatch";
+        string expected = "hit chance must be between [0.0,1.0)\n";
+        expect_stdout<Player>(cout, expected, p, [&m](Player play, ostream &os)
+                              { play.Entity::attack<Monster>(m, 2.0); });
     }
-
-    // on hit (0.999999 chance; technically this might miss)
-    p.Entity::attack<Monster>(m, 0.999999);
+    // on hit (1.0 chance; this always hits bc rand() is [0.0, 1.0))
+    p.Entity::attack<Monster>(m, 1.0);
     // monster still alive and have health left
     EXPECT_NE(m.get_hp(), 0) << "Monster should have health left";
     EXPECT_TRUE(m.isAlive()) << "Monster should be alive";
 
-    // on hit and kill (0.999999; technially this might miss)
-    m.update_hp(0.0); // assuming attacks have >1
-    p.Entity::attack<Monster>(m, 0.999999);
+    // on hit and kill (1.0 chance; this always hits bc rand() is [0.0, 1.0))
+    m.update_hp(1.0);                                      // assuming attacks have >1
+    EXPECT_TRUE(m.isAlive()) << "Monster should be alive"; // should be "alive" before being killed
+    p.Entity::attack<Monster>(m, 1.0);
     EXPECT_EQ(m.get_hp(), 0) << "Monster should have no health left";
     EXPECT_FALSE(m.isAlive()) << "Monster should be dead";
 
-    // on miss (0.0 chance hit; technically this might hit)
+    // on miss (0.0 chance hit; this always misses)
     m.update_hp(INIT_MONSTER_HEALTH); // reset monster health to level 1
-    m.revive(); // set to alive
+    m.revive();                       // set to alive
     // check "no miss" message
     {
-        CaptureStdout();
-        p.Entity::attack<Monster>(m, 0.0);
-        cout.flush();
-        string print_output = GetCapturedStdout();
-        EXPECT_EQ(print_output, "player attack misses!\n") << "\"miss\" message mismatch";
-        EXPECT_NE(m.get_hp(), 0) << "Monster should have health left";
-        EXPECT_TRUE(m.isAlive()) << "Monster should be alive";
+        string expected = "player attack misses!\n";
+        expect_stdout<Player>(cout, expected, p, [&m](Player play, ostream &os)
+                              { play.Entity::attack<Monster>(m, 0.0); });
     }
 }

@@ -16,15 +16,16 @@
 */
 
 // globals
-constexpr unsigned INIT_PLAYER_HEALTH = 100; // initial health
-constexpr unsigned INIT_PLAYER_MAGIC = 100; // initial magic
+constexpr double INIT_PLAYER_HEALTH = 100.0; // initial health
+constexpr double INIT_PLAYER_MAGIC = 100.0; // initial magic
 constexpr double PLAYER_HIT_CHANCE = 0.8; // 80% chance to hit
+constexpr char PLAYER_TYPE [] = "player";
 
 class Player : public Entity
 {
 public:
     // default constructor
-    Player() : Entity("player", INIT_PLAYER_HEALTH, INIT_PLAYER_MAGIC, "player") {}
+    Player() : Entity(PLAYER_TYPE, INIT_PLAYER_HEALTH, INIT_PLAYER_MAGIC, "player") {}
 
     // getters
     unsigned int get_hp_pot_cnt() const { return potions.find("Health Potion")->second;} // [] operator is a non-const member function; use find instead
@@ -105,9 +106,9 @@ private:
     }
 
     // max health
-    double max_health() override { return get_level() * 100.0;}
+    double max_health() override { return get_level() * INIT_PLAYER_HEALTH;}
     // max magic
-    double max_magic() override { return get_level() * 100.0;}
+    double max_magic() override { return get_level() * INIT_PLAYER_MAGIC;}
 };
 
 // out-of-class definition

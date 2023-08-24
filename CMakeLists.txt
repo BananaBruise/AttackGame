@@ -34,6 +34,7 @@ add_executable(
   # add all testing source file under this line
   entity_test.cpp
   player_test.cpp
+  monster_test.cpp
 )
 target_link_libraries( # link tester to gtest library
   tester

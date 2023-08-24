@@ -115,9 +115,9 @@ std::ostream &Entity::print(std::ostream &is) const
     void Entity::attack(Attackee &enemy, double chance_to_hit)
     {
         // if chance is not between 0.0 and 1.0 --> no attack
-        if (chance_to_hit < 0.0 || chance_to_hit >= 1.0)
+        if (chance_to_hit < 0.0 || chance_to_hit > 1.0)
         {
-            std::cout << "hit change must be between [0.0,1.0)" << std::endl;
+            std::cout << "hit chance must be between [0.0,1.0)" << std::endl;
             return;
         }
 
