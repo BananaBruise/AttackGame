@@ -8,7 +8,6 @@
 #include "tester_stdout_helper.h"
 
 using namespace std;
-using namespace testing::internal;
 
 // default constructor & getters
 TEST(PlayerTest, AssertDefaultConstructor)

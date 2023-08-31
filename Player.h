@@ -24,6 +24,9 @@ constexpr char PLAYER_TYPE [] = "player";
 class Player : public Entity
 {
 public:
+    // friendship
+    friend class GameStateManager;
+
     // default constructor
     Player() : Entity(PLAYER_TYPE, INIT_PLAYER_HEALTH, INIT_PLAYER_MAGIC, "player") {}
 
@@ -92,6 +95,14 @@ public:
     template<typename Attackee, typename std::enable_if<std::is_base_of<Entity, Attackee>::value>::type* = nullptr>
     void attack(Attackee &enemy) { Entity::attack(enemy, PLAYER_HIT_CHANCE);}
 
+    // operator overloading
+    bool operator == (const Player &p) const
+    {
+        if (Entity::operator==(p) && this->potions == p.potions)
+            return true;
+
+        return false;
+    }
 private:
     // members
     std::map<std::string, unsigned int> potions = {// potion name, potion count

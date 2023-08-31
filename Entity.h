@@ -14,7 +14,7 @@
 
 // global
 constexpr unsigned INIT_LEVEL = 1; // all entity start at level 1
-constexpr int ATTACK_POINT = 10; // all units have base attack point of 10
+constexpr int ATTACK_POINT = 10;   // all units have base attack point of 10
 constexpr double INIT_BASE_HEALTH = 1.0;
 constexpr double INIT_BASE_MAGIC = 1.0;
 
@@ -32,7 +32,7 @@ public:
     double get_mp() const { return magic_point; }
     int get_level() const { return level; }
     std::string get_desp() const { return description; }
-    bool isAlive() const {return alive;}
+    bool isAlive() const { return alive; }
 
     // setter
     Entity &update_hp(double hp)
@@ -67,23 +67,40 @@ public:
     }
 
     // toggle alive status; dose not change health
-    Entity &kill() {alive = false; return *this;}
-    Entity &revive() {alive = true; return *this;}
+    Entity &kill()
+    {
+        alive = false;
+        return *this;
+    }
+    Entity &revive()
+    {
+        alive = true;
+        return *this;
+    }
 
     /*
     attacker reduces health on attackee. the attack hits by chance between 0.0 and 1.0
 
     attackee must be subclass to entity
     */
-    template<typename Attackee, typename std::enable_if<std::is_base_of<Entity, Attackee>::value>::type* = nullptr>
+    template <typename Attackee, typename std::enable_if<std::is_base_of<Entity, Attackee>::value>::type * = nullptr>
     void attack(Attackee &enemy, double chance_to_hit);
 
     // read-only print
     virtual inline std::ostream &print(std::ostream &is) const override;
 
     // virtuals: health & magic --> dummy values
-    virtual double max_health() {return INIT_BASE_HEALTH;}
-    virtual double max_magic() {return INIT_BASE_MAGIC;}
+    virtual double max_health() { return INIT_BASE_HEALTH; }
+    virtual double max_magic() { return INIT_BASE_MAGIC; }
+
+    // operator overloading
+    bool operator==(const Entity &e) const
+    {
+        if (this->type == e.type && this->health_point == e.health_point && this->magic_point == e.magic_point && this->description == e.description && this->level == e.level && this->alive == e.alive)
+            return true;
+
+        return false;
+    }
 
 private:
     // members:
@@ -111,46 +128,48 @@ std::ostream &Entity::print(std::ostream &is) const
     return is;
 }
 
- template<typename Attackee, typename std::enable_if<std::is_base_of<Entity, Attackee>::value>::type* = nullptr>
-    void Entity::attack(Attackee &enemy, double chance_to_hit)
+template <typename Attackee, typename std::enable_if<std::is_base_of<Entity, Attackee>::value>::type * = nullptr>
+void Entity::attack(Attackee &enemy, double chance_to_hit)
+{
+    // if chance is not between 0.0 and 1.0 --> no attack
+    if (chance_to_hit < 0.0 || chance_to_hit > 1.0)
     {
-        // if chance is not between 0.0 and 1.0 --> no attack
-        if (chance_to_hit < 0.0 || chance_to_hit > 1.0)
-        {
-            std::cout << "hit chance must be between [0.0,1.0)" << std::endl;
+        std::cout << "hit chance must be between [0.0,1.0)" << std::endl;
+        return;
+    }
+
+    // get random number between 0.0-1.0
+    // using old C-style -> apparently not the best idea: https://codingnest.com/generating-random-numbers-using-c-standard-library-the-problems/
+    double roll_hit;
+    // seed based on time
+    std::srand(std::time(nullptr));
+    // generate chance [0.0, 1.0)
+    // https://stackoverflow.com/a/26853142
+    // https://c-faq.com/lib/randrange.html
+    // why? bc rand() gives [0, RAND_MAX], and RAND_MAX + 1.0 returns a double and will always be greater than rand()
+    roll_hit = rand() / (RAND_MAX + 1.0);
+
+    // change to hit
+    if (chance_to_hit > roll_hit) // hit
+    {
+        int attack_point = this->level * ATTACK_POINT;
+        if (attack_point >= enemy.health_point)
+        { // kills enemy
+            enemy.health_point = 0;
+            enemy.kill();
             return;
         }
-
-        // get random number between 0.0-1.0
-        // using old C-style -> apparently not the best idea: https://codingnest.com/generating-random-numbers-using-c-standard-library-the-problems/
-        double roll_hit;
-        // seed based on time
-        std::srand(std::time(nullptr));
-        // generate chance [0.0, 1.0)
-        // https://stackoverflow.com/a/26853142
-        // https://c-faq.com/lib/randrange.html
-        // why? bc rand() gives [0, RAND_MAX], and RAND_MAX + 1.0 returns a double and will always be greater than rand()
-        roll_hit = rand() / (RAND_MAX + 1.0);
-
-        // change to hit
-        if (chance_to_hit > roll_hit) // hit
-            {
-                int attack_point = this->level * ATTACK_POINT;
-                if (attack_point >= enemy.health_point) {// kills enemy
-                    enemy.health_point = 0;
-                    enemy.kill();
-                    return;
-                }
-                else { // reduce health
-                    enemy.health_point -= attack_point;
-                    return;
-                }
-            }
-        else // misses
-        {
-            std::cout << this->type << " attack misses!" << std::endl;
+        else
+        { // reduce health
+            enemy.health_point -= attack_point;
             return;
         }
     }
+    else // misses
+    {
+        std::cout << this->type << " attack misses!" << std::endl;
+        return;
+    }
+}
 
 #endif
