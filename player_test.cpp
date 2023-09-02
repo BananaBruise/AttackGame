@@ -169,8 +169,13 @@ TEST(PlayerTest, AssertAttackOnMonster)
         expect_stdout<Player>(cout, expected, p, [&m](Player play, ostream &os)
                               { play.Entity::attack<Monster>(m, 2.0); });
     }
+    
     // on hit (1.0 chance; this always hits bc rand() is [0.0, 1.0))
-    p.Entity::attack<Monster>(m, 1.0);
+    {
+        string expected = "player hits monster for 10 health!\n";
+        expect_stdout<Player>(cout, expected, p, [&m](Player play, ostream &os)
+                              { play.Entity::attack<Monster>(m, 1.0); });
+    }
     // monster still alive and have health left
     EXPECT_NE(m.get_hp(), 0) << "Monster should have health left";
     EXPECT_TRUE(m.isAlive()) << "Monster should be alive";
@@ -178,7 +183,11 @@ TEST(PlayerTest, AssertAttackOnMonster)
     // on hit and kill (1.0 chance; this always hits bc rand() is [0.0, 1.0))
     m.update_hp(1.0);                                      // assuming attacks have >1
     EXPECT_TRUE(m.isAlive()) << "Monster should be alive"; // should be "alive" before being killed
-    p.Entity::attack<Monster>(m, 1.0);
+    {
+        string expected = "player kills monster!\n";
+        expect_stdout<Player>(cout, expected, p, [&m](Player play, ostream &os)
+                              { play.Entity::attack<Monster>(m, 1.0); });
+    }
     EXPECT_EQ(m.get_hp(), 0) << "Monster should have no health left";
     EXPECT_FALSE(m.isAlive()) << "Monster should be dead";
 

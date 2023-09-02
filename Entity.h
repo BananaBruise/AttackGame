@@ -111,8 +111,8 @@ public:
     }
 
 private:
-    // members:
     const std::string type; // type is read-only and init'd with class constructor
+    // members:
     double health_point;
     double magic_point;
     std::string description;
@@ -165,11 +165,13 @@ void Entity::attack(Attackee &enemy, double chance_to_hit)
         { // kills enemy
             enemy.health_point = 0;
             enemy.kill();
+            std::cout << this->type << " kills " << enemy.type << "!" << std::endl;
             return;
         }
         else
         { // reduce health
             enemy.health_point -= attack_point;
+            std::cout << this->type << " hits " << enemy.type << " for " << attack_point << " health!" << std::endl;
             return;
         }
     }
