@@ -1,0 +1,16 @@
+{
+    "alive": true,
+    "description": "player",
+    "entity_level": 1,
+    "gameStates": {
+        "level": 2,
+        "loaded": false
+    },
+    "health_point": 100.0,
+    "magic_point": 100.0,
+    "potions": {
+        "Health Potion": 0,
+        "Magic Potion": 0
+    },
+    "type": "player"
+}

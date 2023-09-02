@@ -6,9 +6,10 @@
 #include "Player.h"
 #include "Monster.h"
 #include "tester_stdout_helper.h"
+#include "external/nlohmann/json.hpp"
 
 using namespace std;
-using namespace testing::internal;
+using json = nlohmann::json;
 
 // default constructor & getters
 TEST(PlayerTest, AssertDefaultConstructor)
@@ -190,4 +191,30 @@ TEST(PlayerTest, AssertAttackOnMonster)
         expect_stdout<Player>(cout, expected, p, [&m](Player play, ostream &os)
                               { play.Entity::attack<Monster>(m, 0.0); });
     }
+}
+
+// json conversion ability
+TEST(PlayerTest, AssertJsonConversion)
+{
+    Player p;
+    json j;
+
+    // update members for testing
+    // Entity
+    p.level_up(); // level 2
+    p.update_hp(2);
+    p.update_mp(3);
+    p.update_desp("json test");
+    p.kill(); // alive = false
+    // unique to Player
+    p.add_hp_pot();
+    p.add_mp_pot();
+
+    // convert Entity to json (to_json)
+    j = p;
+    // convert json to Entity (from_json)
+    auto p2 = j.get<Player>();
+
+    // compare
+    EXPECT_EQ(p,p2);
 }

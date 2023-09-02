@@ -3,9 +3,10 @@
 #include <iostream>
 #include "Entity.h"
 #include "tester_stdout_helper.h"
+#include "external/nlohmann/json.hpp"
 
 using namespace std;
-using namespace testing::internal;
+using json = nlohmann::json;
 
 // default constructor & getters
 TEST(EntityTest, AssertDefaultConstructor)
@@ -42,4 +43,27 @@ TEST(EntityTest, AssertSetters)
 
     // test with print
     expect_stdout<Entity>(cout,  "type: none, level: 2, hp: 1.0, mp: 1.0, description: description updated", a);
+}
+
+// json conversion ability
+TEST(EntityTest, AssertJsonConversion)
+{
+    Entity a;
+    json j;
+
+    // update members for testing
+    a.level_up(); // level 2
+    a.update_hp(2);
+    a.update_mp(3);
+    a.update_desp("json test");
+    a.kill(); // alive = false
+
+    // convert Entity to json (to_json)
+    j = a;
+    // convert json to Entity (from_json)
+    auto a2 = j.get<Entity>();
+
+    // compare
+    EXPECT_EQ(a,a2);
+
 }

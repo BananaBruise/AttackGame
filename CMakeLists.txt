@@ -5,8 +5,14 @@
 cmake_minimum_required(VERSION 3.14)
 project(attackgame)
 
+# tune code to local machine
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=native")
+
+# get packages
+# find_package(nlohmann_json 3.11.2 REQUIRED)
+
 # GoogleTest requires at least C++14
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
@@ -35,10 +41,11 @@ add_executable(
   entity_test.cpp
   player_test.cpp
   monster_test.cpp
+  game_state_man_test.cpp
 )
-target_link_libraries( # link tester to gtest library
+target_link_libraries(
   tester
-  GTest::gtest_main
+  GTest::gtest_main # linke tester to gtest library
 )
 
 # enable CMake tet runner to discover gtests

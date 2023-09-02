@@ -9,6 +9,9 @@ Learn C++:
 - unit testing ([googletest](https://github.com/google/googletest/tree/main))
 - basic automated GitHub testing (using Action)
 
+## Libraries
+- [nlohmann/json](https://github.com/nlohmann/json)
+
 ## build and run
 ### pre-req (as tested):
   - Ubuntu 22.04.3 LTS (on WSL)

@@ -33,3 +33,7 @@
 
 # Build folder
 build/
+
+# Saves folder except tester file(s)
+saves/*
+!saves/test_read.json
