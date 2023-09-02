@@ -60,6 +60,8 @@ ostream &reset(GameStateManager *&gsm, const string &reset_message = "", ostream
     return os;
 }
 
+void cnewline() {cout<<'\n';}
+
 int main()
 {
     char input;
@@ -68,7 +70,7 @@ int main()
     cout << "Welcome to Attacker Game!" << endl;
     print_menu();
     cin >> input;
-    cout << endl;
+    cnewline();
 
     // initialize game states
     GameStateManager *gsm = init_gsm(SAVE_FILE_PATH);
@@ -103,7 +105,7 @@ int main()
                 m.print(cout) << endl;
                 print_game_menu();
                 cin >> input;
-                cout << endl;
+                cnewline();
 
                 switch (input)
                 {
@@ -130,7 +132,6 @@ int main()
                         continue;
                     }
 
-                    cout << endl;
                     break;
 
                 // H: refill health
@@ -150,6 +151,7 @@ int main()
         }
         print_menu();
         cin >> input;
+        cnewline();
     }
 
     // quitting; save game state
