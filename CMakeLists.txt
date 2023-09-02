@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=native")
 # find_package(nlohmann_json 3.11.2 REQUIRED)
 
 # GoogleTest requires at least C++14
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
@@ -43,10 +43,9 @@ add_executable(
   monster_test.cpp
   game_state_man_test.cpp
 )
-target_link_libraries( # link tester to gtest library
+target_link_libraries(
   tester
-  GTest::gtest_main # gtest library
-  # nlohmann_json::nlohmann_json # json
+  GTest::gtest_main # linke tester to gtest library
 )
 
 # enable CMake tet runner to discover gtests

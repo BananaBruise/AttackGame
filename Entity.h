@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include "IPrintable.h"
+#include "external/nlohmann/json.hpp"
 
 /*
     base class to all playable units such as player and monsters
@@ -20,6 +21,10 @@ constexpr double INIT_BASE_MAGIC = 1.0;
 
 class Entity : public IPrintable
 {
+    // friendships
+    friend void to_json(nlohmann::json &, const Entity &);
+    friend void from_json(const nlohmann::json &, Entity &);
+
 public:
     // default constructor (all optional param)
     // NOTE: order of initialization is the order of decleration (not init list) --> best practice to init to order of declaration
@@ -56,12 +61,15 @@ public:
     /*
         type must be subclass of entity
     */
-    Entity &level_up()
+    Entity &level_up(unsigned cnt = 1, bool update_health = true)
     {
-        level++;
+        level += cnt;
         // update health and magic
-        this->health_point = max_health();
-        this->magic_point = max_magic();
+        if (update_health)
+        {
+            this->health_point = max_health();
+            this->magic_point = max_magic();
+        }
 
         return *this;
     }
@@ -170,6 +178,30 @@ void Entity::attack(Attackee &enemy, double chance_to_hit)
         std::cout << this->type << " attack misses!" << std::endl;
         return;
     }
+}
+
+// non-member definition
+// declare inline to avoid "multiple definition error":
+// https://github.com/nlohmann/json/issues/542
+inline void to_json(nlohmann::json &j, const Entity &e)
+{
+    j = {
+        {"type", e.type},
+        {"health_point", e.health_point},
+        {"magic_point", e.magic_point},
+        {"description", e.description},
+        {"entity_level", e.level},
+        {"alive", e.alive}};
+}
+
+inline void from_json(const nlohmann::json &j, Entity &e)
+{
+    // omit "type" bc it's constant and should already exist after construction
+    j.at("health_point").get_to(e.health_point);
+    j.at("magic_point").get_to(e.magic_point);
+    j.at("description").get_to(e.description);
+    j.at("entity_level").get_to(e.level);
+    j.at("alive").get_to(e.alive);
 }
 
 #endif
