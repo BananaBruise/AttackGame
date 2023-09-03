@@ -22,6 +22,8 @@ constexpr char MONSTER_TYPE [] = "monster";
 class Monster: public Entity {
     public:
     Monster() : Entity(MONSTER_TYPE, INIT_MONSTER_HEALTH, INIT_MONSTER_MAGIC, "monster") {}
+    // cast Monster at specific level
+    Monster(unsigned level) : Monster() {this->level_up(level-INIT_LEVEL);} // number of level to add is (level-INIT_LEVEL)
 
     // overload entity::attack with default monster hit chance
     template<typename Attackee, typename std::enable_if<std::is_base_of<Entity, Attackee>::value>::type* = nullptr>

@@ -24,7 +24,7 @@ Learn C++:
 
 ### run
 #### run unit test ([reference](http://google.github.io/googletest/quickstart-cmake.html#create-and-run-a-binary))
-1. write the tester source code and add to the list of source to be compiled in `CMakeList.txt` under `add_executable` like so:
+1. write the tester source code and add to the list of source to be compiled in `CMakeList.txt` under `add_executable` like so:\
 ![add_executable](documentation/add_executable.jpg) 
 2. compile and build your tester from [above](#build)
 3. Run `./build/tester`. Gtest should've discovers the new source and run all tests compiled
