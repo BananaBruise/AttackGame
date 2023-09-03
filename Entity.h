@@ -61,7 +61,7 @@ public:
     /*
         type must be subclass of entity
     */
-    Entity &level_up(unsigned cnt = 1, bool update_health = true)
+    Entity &level_up(unsigned cnt = 1, bool update_health = true, bool revive = true)
     {
         level += cnt;
         // update health and magic
@@ -70,6 +70,9 @@ public:
             this->health_point = max_health();
             this->magic_point = max_magic();
         }
+        // revive if dead
+        if (!alive && revive)
+            this->alive = true;
 
         return *this;
     }

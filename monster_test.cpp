@@ -32,6 +32,28 @@ TEST(MonsterTest, AssertDefaultConstrutor)
     expect_stdout<Monster>(cout, result.str(), m);
 }
 
+// constructor that specifies monster level
+TEST(MonsterTest, AssertLevelUpConstructor)
+{
+    Monster m (6);
+
+    // using getter
+    EXPECT_EQ(m.get_hp(), pow(m.get_level(), 1.12) * INIT_MONSTER_HEALTH) << "hp mismatch";
+    EXPECT_EQ(m.get_mp(), pow(m.get_level(), 1.12) *INIT_MONSTER_MAGIC) << "mp mismatch";
+    EXPECT_EQ(m.get_desp(), "monster") << "description mismatch";
+    EXPECT_EQ(m.get_level(), 6) << "level mismatch";
+
+    // using print
+    ostringstream result;
+    result << fixed << setprecision(1); // see entity::print()
+    result << "type: " << MONSTER_TYPE
+           << ", level: " << m.get_level()
+           << ", hp: " << pow(m.get_level(), 1.12) * INIT_MONSTER_HEALTH
+           << ", mp: " << pow(m.get_level(), 1.12) * INIT_MONSTER_MAGIC
+           << ", description: " << m.get_desp();
+    expect_stdout<Monster>(cout, result.str(), m);
+}
+
 TEST(MonsterTest, AssertLevelUp)
 {
     Monster m;
