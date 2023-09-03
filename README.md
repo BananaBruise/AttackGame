@@ -1,18 +1,19 @@
-# AttackGame
+# :dragon_face: AttackGame
+<img src="./documentation/Chanter_Angelos_Akotandos_-_St_George_on_Horseback,_Slaying_the_Dragon.jpg" width="300"/>
 
-## What is this?
+## :star: What is this?
 User must defeat 10 monsters, each in increasing power and abilities.
 
-## Purpose
+## :mag: Purpose
 Learn C++:
 - apply OOP concepts
 - unit testing ([googletest](https://github.com/google/googletest/tree/main))
 - basic automated GitHub testing (using Action)
 
-## Libraries
+## :books: Libraries
 - [nlohmann/json](https://github.com/nlohmann/json)
 
-## build and run
+## :factory: build and run
 ### pre-req (as tested):
   - Ubuntu 22.04.3 LTS (on WSL)
   - [cmake](https://cmake.org/)
@@ -28,3 +29,8 @@ Learn C++:
 ![add_executable](documentation/add_executable.jpg) 
 2. compile and build your tester from [above](#build)
 3. Run `./build/tester`. Gtest should've discovers the new source and run all tests compiled
+
+#### run game
+1. compile and build game from [above](#build)
+2. Run `./build/AttackGame`
+3. have fun! 
